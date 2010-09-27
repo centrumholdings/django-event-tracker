@@ -7,31 +7,33 @@ from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand, CommandError
 
-MONGODB_DB = 'events'
-MONGODB_COLLECTION = 'events'
+from eventtracker.conf import settings
+
+
 
 class Command(BaseCommand):
     args = '<timedelta(days) date_now(dd-MM-YYYY) ...>'
     help = 'delete data from the file by refer first argument (date from that delete data in days)'
 
     def handle(self, *args, **options):
-    """
-    delete data from the file by refer argument (date from that delete data)   
-    """
-	date_arg = args[2].split("-")
+	"""
+	delete data from the file by refer argument (date from that delete data)   
+	"""
+	
+	date_arg = args[1].split("-")
 	now_date = datetime(int(date_arg[2]), int(date_arg[1]), int(date_arg[0]))
 	try:
-	    date = now_date - timedelta( days=int(args[1]) )
+	    date = now_date - timedelta( days=int(args[0]) )
 	except TypeError:
 	    raise CommandError('error - bad time argument')
 	
 	connection = pymongo.Connection()
-	db = connection[MONGODB_DB]
-	collection = db[MONGODB_COLLECTION]
+	db = connection[settings.MONGODB_DB]
+	collection = db[settings.MONGODB_COLLECTION]
     
 	try:
 	    collection.remove({"timestamp": {"$lt": date}})
 	except:
 	    raise CommandError('error - can not remove data')
 
-	self.stdout.write('Successfull remove records')
+	print 'Successfull: records removed'
