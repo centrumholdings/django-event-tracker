@@ -14,17 +14,27 @@ from eventtracker.conf import settings
 
 
 class Command(BaseCommand):
-    args = '<timedelta(days) date_now(dd-MM-YYYY) output_file...>'
+    args = '<output_file date_now(dd-MM-YYYY) timedelta(days)>'
     help = 'save data to file by refer argument (date of damp records)'
 
     def handle(self, *args, **options):
 	"""
 	save data to file by refer argument (date of damp records)   
 	"""
-	date_arg = args[1].split("-")
-	now_date = datetime(int(date_arg[2]), int(date_arg[1]), int(date_arg[0]))
 	try:
-	    date = now_date - timedelta( days=int(args[0]) )
+	    date_arg = args[1].split("-")
+	    now_date = datetime(int(date_arg[2]), int(date_arg[1]), int(date_arg[0]))
+	except IndexError:
+	    now_date_full = datetime.now() - timedelta(days=1)
+	    now_date = datetime(now_date_full.year, now_date_full.month, now_date_full.day, 0, 0, 0)
+	
+	try:
+	    retention_interval = int(args[2])
+	except IndexError:
+	    retention_interval = settings.EVENTTRACKING_RETENTION_INTERVAL
+
+	try:
+	    date = now_date - timedelta( days=retention_interval )
 	except TypeError:
 	    raise CommandError('error - bad time argument')
 	
@@ -33,7 +43,7 @@ class Command(BaseCommand):
 		  "date" : date_format
 	}
 
-	process = Popen(["mongoexport", "-q", db_query, "-d", settings.MONGODB_DB, "-c", settings.MONGODB_COLLECTION, "-o", args[2]], stdout=PIPE)
+	process = Popen(["mongoexport", "-q", db_query, "-d", settings.MONGODB_DB, "-c", settings.MONGODB_COLLECTION, "-o", args[0]], stdout=PIPE)
 	process.communicate()
 
 	if process.returncode != 0:
