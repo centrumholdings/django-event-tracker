@@ -35,15 +35,16 @@ class Command(BaseCommand):
 	try:
 	    date = now_date - timedelta( days=retention_interval )
 	except TypeError:
-	    raise CommandError('error - bad time argument')
+	    raise CommandError('error - bad argument: time interval')
 	
 	connection = pymongo.Connection()
 	db = connection[settings.MONGODB_DB]
 	collection = db[settings.MONGODB_COLLECTION]
     
 	try:
-	    collection.remove({"timestamp": {"$lt": date}})
+	    collection.remove({"timestamp": {"$lt": date}}, safe=True)
 	except:
 	    raise CommandError('error - can not remove data')
-
+	
 	print 'Successfull: records removed'
+	

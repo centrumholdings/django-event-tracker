@@ -36,7 +36,7 @@ class Command(BaseCommand):
 	try:
 	    date = now_date - timedelta( days=retention_interval )
 	except TypeError:
-	    raise CommandError('error - bad time argument')
+	    raise CommandError('error - bad argument: time interval')
 	
 	date_format = date.strftime("%s")+'000'
 	db_query = """'{"timestamp": {"$lt": {"$date": %(date)s}}}'""" % {
