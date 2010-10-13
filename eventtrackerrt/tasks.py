@@ -56,7 +56,7 @@ def track(event, params):
         # put the message into the queue including current time
         publisher.send((event, time(), params))
 	print "me-do it"
-	
+	ProcessEventTask.delay()
     except:
         # something went wrong, probably a connection error or something. Close
         # the carrot connection and set it to None so that the next request
