@@ -1,7 +1,7 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from time import time
 
-from celery.task import PeriodicTask
+from celery.task import Task
 from celery.registry import tasks
 from carrot.connection import DjangoBrokerConnection
 from carrot.messaging import Publisher, Consumer
@@ -53,6 +53,7 @@ def track(event, params):
     try:
         # put the message into the queue including current time
         publisher.send((event, time(), params))
+	ProcessEventsTask.delay()
     except:
         # something went wrong, probably a connection error or something. Close
         # the carrot connection and set it to None so that the next request
@@ -76,6 +77,7 @@ def collect_events():
             e, t, p = message.decode()
             models.save_event(collection, e, t, p)
             message.ack()
+	    print e,": ", datetime.now()
 
     finally:
         _close_carrot_object(consumer)
@@ -85,11 +87,12 @@ def collect_events():
             except:
                 pass
 
-class ProcessEventsTask(PeriodicTask):
-    "Celery periodic task that collects events from queue."
-    run_every = timedelta(seconds=settings.TASK_PERIOD)
+class ProcessEventsTask(Task):
+    "Celery task that collect events from queue."
+    name="eventtrackerrt.tasks.ProcessEventsTask"
 
     def run(self, **kwargs):
-        collect_events()
+	collect_events()
+	
 
 tasks.register(ProcessEventsTask)
