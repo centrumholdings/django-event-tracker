@@ -52,8 +52,13 @@ def track(event, params):
 
     try:
         # put the message into the queue including current time
+	tstart = datetime.now()
+	print event,"-start: ", tstart
         publisher.send((event, time(), params))
 	ProcessEventsTask.delay()
+	tend = datetime.now()
+	print event,"-end: ", tend
+	print event,"-diff: ", tend-tstart
     except:
         # something went wrong, probably a connection error or something. Close
         # the carrot connection and set it to None so that the next request
