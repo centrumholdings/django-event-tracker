@@ -75,14 +75,20 @@ def collect_events():
     consumer = None
     collection = None
     try:
+	tstart = datetime.now()
+	print "-start: ", tstart
+
         consumer = _get_carrot_object(Consumer, queue=settings.QUEUE)
         collection = models.get_mongo_collection()
-
         for message in consumer.iterqueue():
             e, t, p = message.decode()
             models.save_event(collection, e, t, p)
             message.ack()
 	    print e,": ", datetime.now()
+	
+	tend = datetime.now()
+	print "-end: ", tend
+	print "-diff: ", tend-tstart
 
     finally:
         _close_carrot_object(consumer)
