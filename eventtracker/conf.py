@@ -35,9 +35,9 @@ MONGODB_DB = 'events'
 MONGODB_COLLECTION = 'events'
 
 # messaging configuration
-ROUTING_KEY = 'events'
-EXCHANGE = 'events'
-QUEUE = 'events'
+ROUTING_KEY = 'celery'
+EXCHANGE = 'celery'
+QUEUE = 'celery'
 
 # collect the events from the queue every three minutes by default
 TASK_PERIOD = 3*60

@@ -1,10 +1,10 @@
 from datetime import timedelta, datetime
 from time import time
 
-from celery.task import Task
-from celery.registry import tasks
+from celery.decorators import task
 from carrot.connection import DjangoBrokerConnection
 from carrot.messaging import Publisher, Consumer
+from celery.utils import gen_unique_id
 
 from eventtracker.conf import settings
 from eventtracker import models 
@@ -17,7 +17,7 @@ def _get_carrot_object(klass, **kwargs):
             connection=DjangoBrokerConnection(),
             exchange=settings.EXCHANGE,
             routing_key=settings.ROUTING_KEY,
-            exchange_type="topic",
+            #exchange_type="topic",
             **kwargs
         )
     
@@ -54,8 +54,7 @@ def track(event, params):
         # put the message into the queue including current time
 	tstart = datetime.now()
 	print event,"-start: ", tstart
-        publisher.send((event, time(), params))
-	ProcessEventsTask.delay()
+	publisher.send({"task": "tasks.collect_events", "args": (event, time(), params), "kwargs": {}, "id": gen_unique_id()})
 	tend = datetime.now()
 	print event,"-end: ", tend
 	print event,"-diff: ", tend-tstart
@@ -68,42 +67,26 @@ def track(event, params):
         raise
 
 
-def collect_events():
+@task(name="tasks.collect_events")
+def collect_events(e, t, p):
     """
     Collect all events waiting in the queue and store them in the database.
     """
-    consumer = None
     collection = None
     try:
 	tstart = datetime.now()
 	print "-start: ", tstart
-
-        consumer = _get_carrot_object(Consumer, queue=settings.QUEUE)
         collection = models.get_mongo_collection()
-        for message in consumer.iterqueue():
-            e, t, p = message.decode()
-            models.save_event(collection, e, t, p)
-            message.ack()
-	    print e,": ", datetime.now()
+        models.save_event(collection, e, t, p)
+	print e,": ", datetime.now()
 	
 	tend = datetime.now()
 	print "-end: ", tend
 	print "-diff: ", tend-tstart
 
     finally:
-        _close_carrot_object(consumer)
         if collection:
             try:
                 collection.connection.close()
             except:
                 pass
-
-class ProcessEventsTask(Task):
-    "Celery task that collect events from queue."
-    name="eventtrackerrt.tasks.ProcessEventsTask"
-
-    def run(self, **kwargs):
-	collect_events()
-	
-
-tasks.register(ProcessEventsTask)
