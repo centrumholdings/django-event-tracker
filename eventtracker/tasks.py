@@ -1,4 +1,3 @@
-from datetime import timedelta, datetime
 from time import time
 
 from celery.decorators import task
@@ -17,7 +16,6 @@ def _get_carrot_object(klass, **kwargs):
             connection=DjangoBrokerConnection(),
             exchange=settings.EXCHANGE,
             routing_key=settings.ROUTING_KEY,
-            #exchange_type="topic",
             **kwargs
         )
     
@@ -39,7 +37,7 @@ def track(event, params):
     Dispatch a track event request into the queue.
 
     If the Publisher object hasn't been intialized yet, do so. If any error
-    occurs during sending of the message, close the Publisher so it will be
+    occurs during sending of the task, close the Publisher so it will be
     open automatically the next time somedy tracks an event. This will prevent
     a short-term network failure to disable one thread from commucating with
     the queue at the cost of retrying the connection every time.
@@ -51,13 +49,8 @@ def track(event, params):
         publisher = _get_carrot_object(Publisher)
 
     try:
-        # put the message into the queue including current time
-	tstart = datetime.now()
-	print event,"-start: ", tstart
+        # put the task into the queue 
 	publisher.send({"task": "tasks.collect_events", "args": (event, time(), params), "kwargs": {}, "id": gen_unique_id()})
-	tend = datetime.now()
-	print event,"-end: ", tend
-	print event,"-diff: ", tend-tstart
     except:
         # something went wrong, probably a connection error or something. Close
         # the carrot connection and set it to None so that the next request
@@ -70,20 +63,13 @@ def track(event, params):
 @task(name="tasks.collect_events")
 def collect_events(e, t, p):
     """
-    Collect all events waiting in the queue and store them in the database.
+    Collect task waiting in the queue and store event in the database.
     """
     collection = None
     try:
-	tstart = datetime.now()
-	print "-start: ", tstart
         collection = models.get_mongo_collection()
         models.save_event(collection, e, t, p)
-	print e,": ", datetime.now()
 	
-	tend = datetime.now()
-	print "-end: ", tend
-	print "-diff: ", tend-tstart
-
     finally:
         if collection:
             try:

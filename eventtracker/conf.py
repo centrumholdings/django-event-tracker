@@ -39,9 +39,6 @@ ROUTING_KEY = 'celery'
 EXCHANGE = 'celery'
 QUEUE = 'celery'
 
-# collect the events from the queue every three minutes by default
-TASK_PERIOD = 3*60
-
 # default backend
 TRACKER_BACKEND = 'celery'
 
