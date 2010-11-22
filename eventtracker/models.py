@@ -2,6 +2,14 @@ from datetime import datetime
 
 from django.db import models
 
+from eventtracker.conf import settings
+
+def get_mongo_collection():
+    "Open a connection to MongoDB and return the collection to use."
+    connection = Connection(settings.MONGODB_HOSTS)
+    return connection[settings.MONGODB_DB][settings.MONGODB_COLLECTION]
+    
+
 def save_event(collection, event, timestamp, params):
     collection.insert({
         'event': event,
