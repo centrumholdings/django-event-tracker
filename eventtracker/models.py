@@ -8,13 +8,7 @@ from eventtracker.conf import settings
 
 def get_mongo_collection():
     "Open a connection to MongoDB and return the collection to use."
-    if settings.RIGHT_MONGODB_HOST:
-        connection = Connection.paired(
-                left=(settings.MONGODB_HOST, settings.MONGODB_PORT),
-                right=(settings.RIGHT_MONGODB_HOST, settings.RIGHT_MONGODB_PORT)
-            )
-    else:
-        connection = Connection(host=settings.MONGODB_HOST, port=settings.MONGODB_PORT)
+    connection = Connection(settings.MONGODB_HOSTS)
     return connection[settings.MONGODB_DB][settings.MONGODB_COLLECTION]
     
 

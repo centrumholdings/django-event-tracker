@@ -21,14 +21,9 @@ class Settings(object):
     def __dir__(self):
         return dir(self.module)
 
-
-# primary mongo connection
-MONGODB_HOST = 'localhost'
-MONGODB_PORT = 27017
-
-# other mongo host if using replica pair
-RIGHT_MONGODB_HOST = None
-RIGHT_MONGODB_PORT = 27017
+MONGODB_HOSTS = [
+    'localhost:27017'
+]
 
 # name of the db and collection in mongo
 MONGODB_DB = 'events'
@@ -37,7 +32,7 @@ MONGODB_COLLECTION = 'events'
 # messaging configuration
 ROUTING_KEY = 'celery'
 EXCHANGE = 'celery'
-QUEUE = 'celery'
+QUEUE = 'events'
 
 # default backend
 TRACKER_BACKEND = 'celery'
