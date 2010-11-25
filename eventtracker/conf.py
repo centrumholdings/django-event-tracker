@@ -22,8 +22,14 @@ class Settings(object):
         return dir(self.module)
 
 MONGODB_HOSTS = [
-    'localhost:27017'
+#    'localhost:27017'
 ]
+
+MONGODB_HOST = 'localhost'
+MONGODB_PORT = 27017
+
+RIGHT_MONGODB_HOST = None
+RIGHT_MONGODB_PORT = 27017
 
 # name of the db and collection in mongo
 MONGODB_DB = 'events'
