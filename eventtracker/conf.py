@@ -2,7 +2,6 @@
 Default settings for django-event-tracker. You can override any of these by
 specifying EVENTS_<CONF_OPTION> in your projects' setting.py.
 """
-
 from django.utils.importlib import import_module
 from django.conf import settings as django_settings
 
