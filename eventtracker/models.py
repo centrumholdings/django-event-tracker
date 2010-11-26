@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+from pymongo import Connection
 
 from eventtracker.conf import settings
 
