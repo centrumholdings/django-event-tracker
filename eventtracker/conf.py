@@ -1,5 +1,3 @@
-from mypage.utils.settings import Settings
-
 from django.utils.importlib import import_module
 from django.conf import settings as django_settings
 
