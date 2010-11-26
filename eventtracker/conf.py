@@ -11,6 +11,7 @@ class Settings(object):
         p_name = '_'.join((self.prefix, name))
         if hasattr(django_settings, p_name):
             return getattr(django_settings, p_name)
+
         return getattr(self.module, name)
 
     def __dir__(self):
@@ -37,4 +38,4 @@ TASK_PERIOD = 3*60
 
 TRACKER_BACKEND = 'celery'
 
-settings = Settings(__name__, 'EVENTS_')
+settings = Settings(__name__, 'EVENTS')
