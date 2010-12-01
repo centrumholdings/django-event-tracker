@@ -37,4 +37,7 @@ QUEUE = 'events'
 # default backend
 TRACKER_BACKEND = 'celery'
 
+# time delta from (in days), that is used for dumping and delete data
+EVENTTRACKING_RETENTION_INTERVAL = 30
+
 settings = Settings(__name__, 'EVENTS')
