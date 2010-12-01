@@ -42,8 +42,8 @@ class Command(BaseCommand):
 	db_query = """'{"timestamp": {"$lt": {"$date": %(date)s}}}'""" % {
 		  "date" : date_format
 	}
-
-	process = Popen(["mongoexport", "-q", db_query, "-d", settings.MONGODB_DB, "-c", settings.MONGODB_COLLECTION, "-o", args[0]], stdout=PIPE)
+	mongo_hosts = string.join(settings.MONGODB_HOSTS, ",")
+	process = Popen(["mongoexport", "-q", db_query, "-h", mongo_hosts, "-d", settings.MONGODB_DB, "-c", settings.MONGODB_COLLECTION, "-o", args[0]], stdout=PIPE)
 	process.communicate()
 
 	if process.returncode != 0:

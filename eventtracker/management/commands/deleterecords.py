@@ -37,7 +37,7 @@ class Command(BaseCommand):
 	except TypeError:
 	    raise CommandError('error - bad argument: time interval')
 	
-	connection = pymongo.Connection()
+	connection = pymongo.Connection(settings.MONGODB_HOSTS)
 	db = connection[settings.MONGODB_DB]
 	collection = db[settings.MONGODB_COLLECTION]
     
