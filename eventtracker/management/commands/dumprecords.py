@@ -1,6 +1,6 @@
 """
-This file takes records from mongo, that are elderly then date argument (first parametr) and save it in file, 
-second parametr is date now a third parametr is output file
+This file takes records from mongo, that are elderly then date argument (third parametr) and save it in file (first argument), 
+second parametr is date now a third parametr is timedelta. Every parametrs are optional
 """
 import sys
 import string
@@ -21,6 +21,7 @@ class Command(BaseCommand):
 	"""
 	save data to file by refer argument (date of damp records)   
 	"""
+	  
 	try:
 	    date_arg = args[1].split("-")
 	    now_date = datetime(int(date_arg[2]), int(date_arg[1]), int(date_arg[0]))
@@ -28,6 +29,11 @@ class Command(BaseCommand):
 	    now_date_full = datetime.now() - timedelta(days=1)
 	    now_date = datetime(now_date_full.year, now_date_full.month, now_date_full.day, 0, 0, 0)
 	
+	try:
+	    mongo_dump_file = args[0]
+	except IndexError:
+	    mongo_dump_file = settings.MONGO_DUMP_FILE % (now_date.day, now_date.month, now_date.year)
+
 	try:
 	    retention_interval = int(args[2])
 	except IndexError:
@@ -43,7 +49,7 @@ class Command(BaseCommand):
 		  "date" : date_format
 	}
 	mongo_hosts = string.join(settings.MONGODB_HOSTS, ",")
-	process = Popen(["mongoexport", "-q", db_query, "-h", mongo_hosts, "-d", settings.MONGODB_DB, "-c", settings.MONGODB_COLLECTION, "-o", args[0]], stdout=PIPE)
+	process = Popen(["mongoexport", "-q", db_query, "-h", mongo_hosts, "-d", settings.MONGODB_DB, "-c", settings.MONGODB_COLLECTION, "-o", mongo_dump_file], stdout=PIPE)
 	process.communicate()
 
 	if process.returncode != 0:

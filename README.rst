@@ -35,7 +35,8 @@ good at that.
 
 For dumping and removal data from mongo was added two management commands: dumprecords and deleterecords.
 In settings is set constant EVENTTRACKING_RETENTION_INTERVAL (default 30 days) as time delta for dumping and removal.
-Use dumprecords with argument output file and two optional arguments (date now in format dd-MM-YYYY and time delta)
+In settings is also set constant MONGO_DUMP_FILE as output file for dumping data. 
+Use dumprecords with three optional arguments (output file, date now in format dd-MM-YYYY and time delta)
 Use deleterecords with two optional arguments (date now in format dd-MM-YYYY and time delta) 
 
 

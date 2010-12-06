@@ -45,4 +45,8 @@ TRACKER_BACKEND = 'celery'
 # time delta from (in days), that is used for dumping and delete data
 EVENTTRACKING_RETENTION_INTERVAL = 30
 
+# output file for dumping data from mongo db
+MONGO_DUMP_FILE = 'mongo_dump_%s_%s_%s'
+
+
 settings = Settings(__name__, 'EVENTS')
